@@ -1,9 +1,10 @@
 import os
 import glob
-import json
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import scipy.special as sp
 from scipy.optimize import minimize_scalar
 
@@ -40,13 +41,15 @@ def optimized_kennedy_bound(alpha, eta=1.0, nu=0.0, pi0=0.5, T=1.0):
         return np.array([optimized_kennedy_bound(a, eta=eta, nu=nu, pi0=pi0, T=T) for a in alpha])
 
 # ==============================================================================
-# Main Plotting Function
+# Master Plotting Function
 # ==============================================================================
 
-def plot_12_scenarios(data_source="runs", output_prefix="quantum_receiver_12_scenarios"):
+def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scenarios"):
     """
-    Plots a 3x4 multi-panel grid comparing all 12 physical scenarios.
-    Accepts either a directory of runs ('runs/') or a combined CSV/Parquet file.
+    Dynamically plots ALL scenarios found in the dataset.
+    Generates:
+      1. A multi-page PDF (12 subplots per page) for high-resolution reading.
+      2. A full comprehensive master poster image (all scenarios in one giant grid).
     """
     # 1. Load Data
     if os.path.isdir(data_source):
@@ -64,72 +67,116 @@ def plot_12_scenarios(data_source="runs", output_prefix="quantum_receiver_12_sce
         print(f"Error: Data source '{data_source}' not found.")
         return
 
-    # Extract unique scenarios in order
     scenarios = df["scenario"].unique()
     n_scenarios = len(scenarios)
-    print(f"Found {n_scenarios} scenarios: {list(scenarios)}")
-
-    # 2. Setup Plot Grid (3 rows x 4 columns)
-    nrows, ncols = 3, 4
-    fig, axes = plt.subplots(nrows, ncols, figsize=(20, 14), sharex=True, sharey=True)
-    axes = axes.flatten()
+    print(f"Found {n_scenarios} total scenarios in dataset.")
 
     alpha_fine = np.linspace(0.05, 1.8, 200)
     ideal_helstrom = helstrom_bound(alpha_fine, eta=1.0)
     ideal_kennedy = optimized_kennedy_bound(alpha_fine, eta=1.0, nu=0.0)
 
+    # --------------------------------------------------------------------------
+    # Output 1: Multi-Page PDF (12 subplots per page for high legibility)
+    # --------------------------------------------------------------------------
+    plots_per_page = 12
+    n_pages = math.ceil(n_scenarios / plots_per_page)
+    pdf_path = f"{output_prefix}_multipage.pdf"
+
+    with PdfPages(pdf_path) as pdf:
+        for page_idx in range(n_pages):
+            start_sc = page_idx * plots_per_page
+            end_sc = min(start_sc + plots_per_page, n_scenarios)
+            page_scenarios = scenarios[start_sc:end_sc]
+
+            fig, axes = plt.subplots(3, 4, figsize=(20, 14), sharex=True, sharey=True)
+            axes = axes.flatten()
+
+            for i, sc_name in enumerate(page_scenarios):
+                ax = axes[i]
+                sc_df = df[df["scenario"] == sc_name]
+                dolinar_df = sc_df[sc_df["receiver"] == "Dolinar"].sort_values("alpha")
+                kennedy_df = sc_df[sc_df["receiver"] == "Opt_Kennedy"].sort_values("alpha")
+
+                ax.semilogy(alpha_fine, ideal_helstrom, 'k-', linewidth=2.0, alpha=0.85, label=r'Ideal Helstrom ($\eta=1.0$)')
+                ax.semilogy(alpha_fine, ideal_kennedy, color='darkorange', linestyle=':', linewidth=2.0, label=r'Ideal Opt-Kennedy ($\eta=1.0$)')
+
+                if not dolinar_df.empty:
+                    ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=6.5, label='Dolinar Receiver')
+                if not kennedy_df.empty:
+                    ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=6.5, markeredgewidth=1.6, label='Optimized Kennedy')
+
+                ax.set_title(sc_name.replace("_", " "), fontsize=11, fontweight='bold')
+                ax.set_xlim(0.1, 1.8)
+                ax.set_ylim(1e-7, 0.8)
+                ax.grid(True, which='both', linestyle=':', alpha=0.5)
+
+                if i >= 8:
+                    ax.set_xlabel(r'Amplitude $\alpha$', fontsize=10.5)
+                if i % 4 == 0:
+                    ax.set_ylabel('Bit Error Rate (BER)', fontsize=10.5)
+                if i == 0:
+                    ax.legend(loc='lower left', fontsize=8.5)
+
+            for i in range(len(page_scenarios), len(axes)):
+                axes[i].set_visible(False)
+
+            plt.suptitle(f'Quantum Receiver Benchmark (Scenarios {start_sc + 1} to {end_sc} of {n_scenarios})', fontsize=15, y=0.995)
+            plt.tight_layout()
+            pdf.savefig(fig, bbox_inches='tight')
+            plt.close(fig)
+
+    # --------------------------------------------------------------------------
+    # Output 2: Single Giant Master Poster (Grid covering all N scenarios)
+    # --------------------------------------------------------------------------
+    ncols = 6
+    nrows = math.ceil(n_scenarios / ncols)
+    fig_w = ncols * 4.5
+    fig_h = nrows * 3.5
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(fig_w, fig_h), sharex=True, sharey=True)
+    axes = np.array(axes).flatten()
+
     for idx, sc_name in enumerate(scenarios):
-        if idx >= len(axes):
-            break
         ax = axes[idx]
         sc_df = df[df["scenario"] == sc_name]
-
-        # Extract subsets
         dolinar_df = sc_df[sc_df["receiver"] == "Dolinar"].sort_values("alpha")
         kennedy_df = sc_df[sc_df["receiver"] == "Opt_Kennedy"].sort_values("alpha")
 
-        # Theoretical Ideal Reference Curves
-        ax.semilogy(alpha_fine, ideal_helstrom, 'k-', linewidth=2.0, alpha=0.85, label=r'Ideal Helstrom ($\eta=1.0$)')
-        ax.semilogy(alpha_fine, ideal_kennedy, color='darkorange', linestyle=':', linewidth=2.0, label=r'Ideal Opt-Kennedy ($\eta=1.0$)')
+        ax.semilogy(alpha_fine, ideal_helstrom, 'k-', linewidth=1.8, alpha=0.85, label='Ideal Helstrom')
+        ax.semilogy(alpha_fine, ideal_kennedy, color='darkorange', linestyle=':', linewidth=1.8, label='Ideal Opt-Kennedy')
 
-        # Simulated Data Points
         if not dolinar_df.empty:
-            ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=6.5, label='Dolinar Receiver')
+            ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=5.5, label='Dolinar')
         if not kennedy_df.empty:
-            ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=6.5, markeredgewidth=1.6, label='Optimized Kennedy')
+            ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=5.5, markeredgewidth=1.4, label='Opt-Kennedy')
 
-        # Clean Title & Formatting
-        formatted_title = sc_name.replace("_", " ")
-        ax.set_title(formatted_title, fontsize=11, fontweight='bold')
+        ax.set_title(sc_name.replace("_", " "), fontsize=9.5, fontweight='bold')
         ax.set_xlim(0.1, 1.8)
         ax.set_ylim(1e-7, 0.8)
         ax.grid(True, which='both', linestyle=':', alpha=0.5)
 
-        # Labels for outer subplots
         if idx >= (nrows - 1) * ncols:
-            ax.set_xlabel(r'Amplitude $\alpha$', fontsize=10.5)
+            ax.set_xlabel(r'Amplitude $\alpha$', fontsize=9.5)
         if idx % ncols == 0:
-            ax.set_ylabel('Bit Error Rate (BER)', fontsize=10.5)
-
+            ax.set_ylabel('BER', fontsize=9.5)
         if idx == 0:
-            ax.legend(loc='lower left', fontsize=8.5)
+            ax.legend(loc='lower left', fontsize=7.5)
 
-    # Hide any unused subplots if fewer than 12
     for idx in range(n_scenarios, len(axes)):
         axes[idx].set_visible(False)
 
-    plt.suptitle('Quantum Receiver BPSK Discrimination: 12 HPC Physical Scenarios Benchmark', fontsize=15, y=0.995)
+    plt.suptitle(f'Complete Quantum Receiver Sweep ({n_scenarios} Physical Scenarios)', fontsize=16, y=0.998)
     plt.tight_layout()
 
-    # Save outputs
-    png_path = f"{output_prefix}.png"
-    pdf_path = f"{output_prefix}.pdf"
-    plt.savefig(png_path, dpi=300, bbox_inches='tight')
-    plt.savefig(pdf_path, bbox_inches='tight')
-    print(f"Plots saved successfully:\n  • {png_path} (300 DPI)\n  • {pdf_path} (Vector PDF)")
-    plt.close()
+    poster_png = f"{output_prefix}_all_{n_scenarios}.png"
+    plt.savefig(poster_png, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+    print(f"Generated successfully:")
+    print(f"  • Multi-Page PDF (12 per page): {pdf_path}")
+    print(f"  • Complete Master Poster ({nrows}x{ncols} grid): {poster_png}")
 
 if __name__ == "__main__":
     import sys
     src = sys.argv[1] if len(sys.argv) > 1 else "runs"
-    plot_12_scenarios(data_source=src)
+    plot_all_scenarios(data_source=src)

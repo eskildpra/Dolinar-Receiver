@@ -1,0 +1,57 @@
+{
+  "1":  {"name": "01_Ideal_Baseline", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "2":  {"name": "02_Phase_Jitter_2deg", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 2.0},
+  "3":  {"name": "03_Phase_Jitter_5deg", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 5.0},
+  "4":  {"name": "04_Phase_Jitter_8deg", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 8.0},
+  "5":  {"name": "05_Phase_Jitter_12deg", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 12.0},
+  "6":  {"name": "06_Phase_Jitter_18deg", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 18.0},
+
+  "7":  {"name": "07_Latency_0.5pct", "eta": 1.00, "nu": 0.000, "lat": 0.005, "dead": 0.00, "jit_deg": 0.0},
+  "8":  {"name": "08_Latency_1.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.010, "dead": 0.00, "jit_deg": 0.0},
+  "9":  {"name": "09_Latency_1.5pct", "eta": 1.00, "nu": 0.000, "lat": 0.015, "dead": 0.00, "jit_deg": 0.0},
+  "10": {"name": "10_Latency_2.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.020, "dead": 0.00, "jit_deg": 0.0},
+  "11": {"name": "11_Latency_3.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.030, "dead": 0.00, "jit_deg": 0.0},
+  "12": {"name": "12_Latency_5.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.050, "dead": 0.00, "jit_deg": 0.0},
+
+  "13": {"name": "13_Efficiency_98pct", "eta": 0.98, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "14": {"name": "14_Efficiency_90pct", "eta": 0.90, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "15": {"name": "15_Efficiency_80pct", "eta": 0.80, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "16": {"name": "16_Efficiency_70pct", "eta": 0.70, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "17": {"name": "17_Efficiency_55pct", "eta": 0.55, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "18": {"name": "18_Efficiency_40pct", "eta": 0.40, "nu": 0.000, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+
+  "19": {"name": "19_Dark_Counts_1e-5", "eta": 1.00, "nu": 0.00001, "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "20": {"name": "20_Dark_Counts_1e-4", "eta": 1.00, "nu": 0.0001,  "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "21": {"name": "21_Dark_Counts_1e-3", "eta": 1.00, "nu": 0.001,   "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "22": {"name": "22_Dark_Counts_5e-3", "eta": 1.00, "nu": 0.005,   "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "23": {"name": "23_Dark_Counts_1e-2", "eta": 1.00, "nu": 0.010,   "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+  "24": {"name": "24_Dark_Counts_5e-2", "eta": 1.00, "nu": 0.050,   "lat": 0.00, "dead": 0.00, "jit_deg": 0.0},
+
+  "25": {"name": "25_Dead_Time_0.5pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.005, "jit_deg": 0.0},
+  "26": {"name": "26_Dead_Time_1.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.010, "jit_deg": 0.0},
+  "27": {"name": "27_Dead_Time_2.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.020, "jit_deg": 0.0},
+  "28": {"name": "28_Dead_Time_3.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.030, "jit_deg": 0.0},
+  "29": {"name": "29_Dead_Time_5.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.050, "jit_deg": 0.0},
+  "30": {"name": "30_Dead_Time_8.0pct", "eta": 1.00, "nu": 0.000, "lat": 0.00, "dead": 0.080, "jit_deg": 0.0},
+
+  "31": {"name": "31_Latency1pct_Jitter5deg", "eta": 1.00, "nu": 0.000, "lat": 0.01, "dead": 0.00, "jit_deg": 5.0},
+  "32": {"name": "32_Latency2pct_Jitter5deg", "eta": 1.00, "nu": 0.000, "lat": 0.02, "dead": 0.00, "jit_deg": 5.0},
+  "33": {"name": "33_Latency3pct_Jitter5deg", "eta": 1.00, "nu": 0.000, "lat": 0.03, "dead": 0.00, "jit_deg": 5.0},
+  "34": {"name": "34_Latency1pct_Jitter10deg", "eta": 1.00, "nu": 0.000, "lat": 0.01, "dead": 0.00, "jit_deg": 10.0},
+  "35": {"name": "35_Latency2pct_Jitter10deg", "eta": 1.00, "nu": 0.000, "lat": 0.02, "dead": 0.00, "jit_deg": 10.0},
+  "36": {"name": "36_Latency3pct_Jitter10deg", "eta": 1.00, "nu": 0.000, "lat": 0.03, "dead": 0.00, "jit_deg": 10.0},
+
+  "37": {"name": "37_Commercial_APD_LowNoise",  "eta": 0.70, "nu": 0.005, "lat": 0.02, "dead": 0.03, "jit_deg": 5.0},
+  "38": {"name": "38_Commercial_APD_MidNoise",  "eta": 0.65, "nu": 0.010, "lat": 0.02, "dead": 0.04, "jit_deg": 8.0},
+  "39": {"name": "39_Commercial_APD_HighNoise", "eta": 0.60, "nu": 0.020, "lat": 0.03, "dead": 0.05, "jit_deg": 10.0},
+  "40": {"name": "40_Cheap_APD_ExtremeNoise",   "eta": 0.50, "nu": 0.050, "lat": 0.04, "dead": 0.08, "jit_deg": 15.0},
+  "41": {"name": "41_FreeSpace_Turbulent_APD",  "eta": 0.55, "nu": 0.010, "lat": 0.02, "dead": 0.03, "jit_deg": 18.0},
+  "42": {"name": "42_FiberLink_Standard_APD",   "eta": 0.68, "nu": 0.002, "lat": 0.015, "dead": 0.03, "jit_deg": 4.0},
+
+  "43": {"name": "43_NIST_JPL_Record_SNSPD",      "eta": 0.98, "nu": 0.00001, "lat": 0.003, "dead": 0.004, "jit_deg": 1.0},
+  "44": {"name": "44_SingleQuantum_Commercial",  "eta": 0.92, "nu": 0.0002,  "lat": 0.006, "dead": 0.005, "jit_deg": 2.5},
+  "45": {"name": "45_SIMIT_CAS_HighEff_SNSPD",    "eta": 0.95, "nu": 0.0001,  "lat": 0.005, "dead": 0.005, "jit_deg": 2.0},
+  "46": {"name": "46_Becerra_NIST_2013_Benchmark", "eta": 0.55, "nu": 0.0016, "lat": 0.014, "dead": 0.020, "jit_deg": 4.0},
+  "47": {"name": "47_IDQuantique_ID230_InGaAs",   "eta": 0.25, "nu": 0.0100,  "lat": 0.020, "dead": 0.080, "jit_deg": 8.0},
+  "48": {"name": "48_Excelitas_Silicon_APD",      "eta": 0.68, "nu": 0.0020,  "lat": 0.010, "dead": 0.008, "jit_deg": 3.0}
+}

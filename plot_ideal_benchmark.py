@@ -95,34 +95,42 @@ def plot_ideal_benchmark(data_source="combined_results.csv", scenario_name="01_I
     kennedy_df = sc_df[sc_df["receiver"] == "Opt_Kennedy"].sort_values("alpha")
 
     # 2. Compute Theoretical Bounds
-    alpha_grid = np.linspace(0.05, 1.8, 250)
+    alpha_grid = np.linspace(0.05, 1.8, 300)
     helstrom_curve = helstrom_bound(alpha_grid, eta=1.0, pi0=0.5)
     homodyne_curve = homodyne_bound(alpha_grid, pi0=0.5)
     std_kennedy_curve = standard_kennedy_bound(alpha_grid, eta=1.0, pi0=0.5)
     opt_kennedy_curve = optimized_kennedy_bound(alpha_grid, eta=1.0, nu=0.0, pi0=0.5)
 
-    # 3. Create the Benchmark Plot
-    plt.figure(figsize=(11, 7.5))
+    # 3. Create the Benchmark Plot with Larger Fonts & Bottom-Left Legend
+    fig, ax = plt.subplots(figsize=(12, 8))
     
     # Continuous Quantum & Classical Limits
-    plt.semilogy(alpha_grid, helstrom_curve, 'k-', linewidth=2.5, label='Helstrom Bound (Quantum Limit)')
-    plt.semilogy(alpha_grid, homodyne_curve, 'g--', linewidth=2.0, label='Homodyne Detection (Standard Quantum Limit - SQL)')
-    plt.semilogy(alpha_grid, std_kennedy_curve, 'c-.', linewidth=2.0, label=r'Standard Kennedy Bound ($\beta=-\alpha$)')
-    plt.semilogy(alpha_grid, opt_kennedy_curve, color='darkorange', linestyle=':', linewidth=2.2, label=r'Optimized Kennedy Bound ($\beta=-\beta_{opt}$)')
+    ax.semilogy(alpha_grid, helstrom_curve, 'k-', linewidth=2.8, label='Helstrom Bound (Quantum Limit)')
+    ax.semilogy(alpha_grid, homodyne_curve, 'g--', linewidth=2.4, label='Homodyne Detection (Standard Quantum Limit - SQL)')
+    ax.semilogy(alpha_grid, std_kennedy_curve, 'c-.', linewidth=2.4, label=r'Standard Kennedy Bound ($\beta=-\alpha$)')
+    ax.semilogy(alpha_grid, opt_kennedy_curve, color='darkorange', linestyle=':', linewidth=2.6, label=r'Optimized Kennedy Bound ($\beta=-\beta_{opt}$)')
 
     # Simulated Data Points from HPC Run
     if not dolinar_df.empty:
-        plt.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=7.5, label=r'Dolinar Receiver Simulation (Geremia HJB)')
+        ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=8.5, label=r'Dolinar Receiver Simulation (Geremia HJB)')
     if not kennedy_df.empty:
-        plt.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=7.5, markeredgewidth=1.8, label=r'Optimized Kennedy Simulation ($\beta=-\beta_{opt}$)')
+        ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=8.5, markeredgewidth=2.0, label=r'Optimized Kennedy Simulation ($\beta=-\beta_{opt}$)')
 
-    plt.title(f'BPSK Quantum Receiver Discrimination: Benchmark against Ideal Theoretical Limits', fontsize=12, fontweight='bold')
-    plt.xlabel(r'Coherent State Amplitude $\alpha$ (Mean Photon Number $\bar{n}=\alpha^2$)', fontsize=11)
-    plt.ylabel('Bit Error Rate (BER)', fontsize=11)
-    plt.ylim(1e-7, 0.8)
-    plt.xlim(0.1, 1.8)
-    plt.grid(True, which='both', linestyle=':', alpha=0.5)
-    plt.legend(loc='best', fontsize=10)
+    # Typography & Sizing
+    ax.set_title('BPSK Quantum Receiver Discrimination: Benchmark against Ideal Theoretical Limits', fontsize=15, fontweight='bold', pad=14)
+    ax.set_xlabel(r'Coherent State Amplitude $\alpha$ (Mean Photon Number $\bar{n}=\alpha^2$)', fontsize=14, labelpad=10)
+    ax.set_ylabel('Bit Error Rate (BER)', fontsize=14, labelpad=10)
+    
+    ax.tick_params(axis='both', which='major', labelsize=12.5, length=6)
+    ax.tick_params(axis='both', which='minor', labelsize=11, length=3.5)
+    
+    ax.set_ylim(1e-7, 0.8)
+    ax.set_xlim(0.1, 1.8)
+    ax.grid(True, which='both', linestyle=':', alpha=0.5)
+    
+    # Legend Placed at Bottom-Left with Increased Font Size
+    ax.legend(loc='lower left', fontsize=12, framealpha=0.92, edgecolor='gray')
+    
     plt.tight_layout()
 
     # Save PNG and PDF

@@ -44,13 +44,15 @@ def optimized_kennedy_bound(alpha, eta=1.0, nu=0.0, pi0=0.5, T=1.0):
 # Master Plotting Function
 # ==============================================================================
 
-def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scenarios"):
+def plot_all_scenarios(data_source="runs", output_dir="images", output_prefix="quantum_receiver_scenarios"):
     """
     Dynamically plots ALL scenarios found in the dataset.
     Generates:
       1. A multi-page PDF (12 subplots per page) for high-resolution reading.
       2. A full comprehensive master poster image (all scenarios in one giant grid).
     """
+    os.makedirs(output_dir, exist_ok=True)
+    out_base = os.path.join(output_dir, output_prefix)
     # 1. Load Data
     if os.path.isdir(data_source):
         csv_files = sorted(glob.glob(os.path.join(data_source, "*", "results.csv")))
@@ -59,10 +61,7 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
             return
         df = pd.concat([pd.read_csv(f) for f in csv_files], ignore_index=True)
     elif os.path.isfile(data_source):
-        if data_source.endswith(".parquet"):
-            df = pd.read_parquet(data_source)
-        else:
-            df = pd.read_csv(data_source)
+        df = pd.read_parquet(data_source) if data_source.endswith(".parquet") else pd.read_csv(data_source)
     else:
         print(f"Error: Data source '{data_source}' not found.")
         return
@@ -80,7 +79,7 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
     # --------------------------------------------------------------------------
     plots_per_page = 12
     n_pages = math.ceil(n_scenarios / plots_per_page)
-    pdf_path = f"{output_prefix}_multipage.pdf"
+    pdf_path = f"{out_base}_multipage.pdf"
 
     with PdfPages(pdf_path) as pdf:
         for page_idx in range(n_pages):
@@ -105,17 +104,21 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
                 if not kennedy_df.empty:
                     ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=6.5, markeredgewidth=1.6, label='Optimized Kennedy')
 
-                ax.set_title(sc_name.replace("_", " "), fontsize=11, fontweight='bold')
+                ax.set_title(sc_name.replace("_", " "), fontsize=11.5, fontweight='bold')
                 ax.set_xlim(0.1, 1.8)
                 ax.set_ylim(1e-7, 0.8)
                 ax.grid(True, which='both', linestyle=':', alpha=0.5)
 
+                # Matched Tick Sizes
+                ax.tick_params(axis='both', which='major', labelsize=12.5, length=6)
+                ax.tick_params(axis='both', which='minor', labelsize=11, length=3.5)
+
                 if i >= 8:
-                    ax.set_xlabel(r'Amplitude $\alpha$', fontsize=10.5)
+                    ax.set_xlabel(r'Amplitude $\alpha$', fontsize=12)
                 if i % 4 == 0:
-                    ax.set_ylabel('Bit Error Rate (BER)', fontsize=10.5)
+                    ax.set_ylabel('Bit Error Rate (BER)', fontsize=12)
                 if i == 0:
-                    ax.legend(loc='lower left', fontsize=8.5)
+                    ax.legend(loc='lower left', fontsize=9.5)
 
             for i in range(len(page_scenarios), len(axes)):
                 axes[i].set_visible(False)
@@ -126,7 +129,7 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
             plt.close(fig)
 
     # --------------------------------------------------------------------------
-    # Output 2: Single Giant Master Poster (Grid covering all N scenarios)
+    # Output 2: Single Master Poster Grid
     # --------------------------------------------------------------------------
     ncols = 6
     nrows = math.ceil(n_scenarios / ncols)
@@ -155,10 +158,13 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
         ax.set_ylim(1e-7, 0.8)
         ax.grid(True, which='both', linestyle=':', alpha=0.5)
 
+        ax.tick_params(axis='both', which='major', labelsize=11, length=5)
+        ax.tick_params(axis='both', which='minor', labelsize=9.5, length=3)
+
         if idx >= (nrows - 1) * ncols:
-            ax.set_xlabel(r'Amplitude $\alpha$', fontsize=9.5)
+            ax.set_xlabel(r'Amplitude $\alpha$', fontsize=10)
         if idx % ncols == 0:
-            ax.set_ylabel('BER', fontsize=9.5)
+            ax.set_ylabel('BER', fontsize=10)
         if idx == 0:
             ax.legend(loc='lower left', fontsize=7.5)
 
@@ -168,7 +174,7 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
     plt.suptitle(f'Complete Quantum Receiver Sweep ({n_scenarios} Physical Scenarios)', fontsize=16, y=0.998)
     plt.tight_layout()
 
-    poster_png = f"{output_prefix}_all_{n_scenarios}.png"
+    poster_png = f"{out_base}_all_{n_scenarios}.png"
     plt.savefig(poster_png, dpi=300, bbox_inches='tight')
     plt.close(fig)
 
@@ -177,6 +183,5 @@ def plot_all_scenarios(data_source="runs", output_prefix="quantum_receiver_scena
     print(f"  • Complete Master Poster ({nrows}x{ncols} grid): {poster_png}")
 
 if __name__ == "__main__":
-    import sys
     src = sys.argv[1] if len(sys.argv) > 1 else "runs"
-    plot_all_scenarios(data_source=src)
+    plot_all_scenarios(data_source=src, output_dir="images")

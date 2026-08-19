@@ -57,10 +57,12 @@ def optimized_kennedy_bound(alpha, eta=1.0, nu=0.0, pi0=0.5, T=1.0):
 # Plotting from Combined Results
 # ==============================================================================
 
-def plot_ideal_benchmark(data_source="combined_results.csv", scenario_name="01_Ideal", output_file="ideal_benchmark_comparison.png"):
+def plot_ideal_benchmark(data_source="combined_results.csv", scenario_name="01_Ideal", output_dir="images", output_filename="ideal_benchmark_comparison.png"):
     """
     Loads simulated data from data_source and plots it against all 4 fundamental theoretical bounds.
     """
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, output_filename)
     # 1. Load Data
     if os.path.isdir(data_source):
         csv_files = sorted(glob.glob(os.path.join(data_source, "*", "results.csv")))
@@ -105,31 +107,30 @@ def plot_ideal_benchmark(data_source="combined_results.csv", scenario_name="01_I
     fig, ax = plt.subplots(figsize=(12, 8))
     
     # Continuous Quantum & Classical Limits
-    ax.semilogy(alpha_grid, helstrom_curve, 'k-', linewidth=2.8, label='Helstrom Bound (Quantum Limit)')
-    ax.semilogy(alpha_grid, homodyne_curve, 'g--', linewidth=2.4, label='Homodyne Detection (Standard Quantum Limit - SQL)')
-    ax.semilogy(alpha_grid, std_kennedy_curve, 'c-.', linewidth=2.4, label=r'Standard Kennedy Bound ($\beta=-\alpha$)')
-    ax.semilogy(alpha_grid, opt_kennedy_curve, color='darkorange', linestyle=':', linewidth=2.6, label=r'Optimized Kennedy Bound ($\beta=-\beta_{opt}$)')
-
-    # Simulated Data Points from HPC Run
-    if not dolinar_df.empty:
-        ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=8.5, label=r'Dolinar Receiver Simulation (Geremia HJB)')
+    ax.semilogy(alpha_grid, homodyne_curve, 'g--', linewidth=2.4, label='Homodyne Detection')
+    ax.semilogy(alpha_grid, std_kennedy_curve, 'c-.', linewidth=2.4, label=r'Standard Kennedy Bound')
+    ax.semilogy(alpha_grid, opt_kennedy_curve, color='darkorange', linestyle=':', linewidth=2.6, label=r'Displacement Optimized Kennedy Bound')
     if not kennedy_df.empty:
-        ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=8.5, markeredgewidth=2.0, label=r'Optimized Kennedy Simulation ($\beta=-\beta_{opt}$)')
+        ax.semilogy(kennedy_df["alpha"], kennedy_df["ber"], 'rx', markersize=8.5, markeredgewidth=2.0, label=r'Displacement Optimized Kennedy Simulation')
+    ax.semilogy(alpha_grid, helstrom_curve, 'k-', linewidth=2.8, label='Helstrom Bound (Quantum Limit)')
+
+    if not dolinar_df.empty:
+        ax.semilogy(dolinar_df["alpha"], dolinar_df["ber"], 'g^', markersize=8.5, label=r'Dolinar Receiver Simulation')
 
     # Typography & Sizing
-    ax.set_title('BPSK Quantum Receiver Discrimination: Benchmark against Ideal Theoretical Limits', fontsize=15, fontweight='bold', pad=14)
-    ax.set_xlabel(r'Coherent State Amplitude $\alpha$ (Mean Photon Number $\bar{n}=\alpha^2$)', fontsize=14, labelpad=10)
-    ax.set_ylabel('Bit Error Rate (BER)', fontsize=14, labelpad=10)
+    ax.set_title('Dolinar Simulation Against Ideal Theoretical Limits', fontsize=18, fontweight='bold', pad=14)
+    ax.set_xlabel(r'Coherent State Amplitude $\alpha$', fontsize=16, labelpad=10)
+    ax.set_ylabel('Bit Error Rate (BER)', fontsize=16, labelpad=10)
     
-    ax.tick_params(axis='both', which='major', labelsize=12.5, length=6)
-    ax.tick_params(axis='both', which='minor', labelsize=11, length=3.5)
+    ax.tick_params(axis='both', which='major', labelsize=13.5, length=6)
+    ax.tick_params(axis='both', which='minor', labelsize=12, length=3.5)
     
     ax.set_ylim(1e-7, 0.8)
     ax.set_xlim(0.1, 1.8)
     ax.grid(True, which='both', linestyle=':', alpha=0.5)
     
     # Legend Placed at Bottom-Left with Increased Font Size
-    ax.legend(loc='lower left', fontsize=12, framealpha=0.92, edgecolor='gray')
+    ax.legend(loc='lower left', fontsize=16, framealpha=0.92, edgecolor='gray')
     
     plt.tight_layout()
 
@@ -143,4 +144,4 @@ def plot_ideal_benchmark(data_source="combined_results.csv", scenario_name="01_I
 if __name__ == "__main__":
     src = sys.argv[1] if len(sys.argv) > 1 else "combined_results.csv"
     sc_target = sys.argv[2] if len(sys.argv) > 2 else "01_Ideal"
-    plot_ideal_benchmark(data_source=src, scenario_name=sc_target)
+    plot_ideal_benchmark(data_source=src, scenario_name=sc_target, output_dir="images")
